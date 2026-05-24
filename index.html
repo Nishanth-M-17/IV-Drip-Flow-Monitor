@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IVGuard — Clinical Monitoring System</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="layout">
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">
+      <div class="brand"><i class="ti ti-activity-heartbeat"></i> IVGuard</div>
+      <div class="sub">CLINICAL MONITORING SYSTEM</div>
+    </div>
+
+    <nav class="nav-section">
+      <div class="nav-label">Navigation</div>
+      <div class="nav-item active" data-page="live"><i class="ti ti-layout-dashboard"></i>Live View</div>
+      <div class="nav-item" data-page="records"><i class="ti ti-file-medical"></i>Patient Records</div>
+      <div class="nav-item" data-page="alerts"><i class="ti ti-bell-ringing"></i>Alerts Log</div>
+      <div class="nav-item" data-page="settings"><i class="ti ti-device-desktop-analytics"></i>Device Settings</div>
+    </nav>
+
+    <div class="sidebar-patients">
+      <div class="nav-label">Active Patients (Live View)</div>
+      <div class="search-wrap">
+        <input class="patient-search" type="text" id="ptSearch" placeholder="Search room or name…" aria-label="Search patients"/>
+      </div>
+      <div id="patientList">
+        <div class="patient-item active-pt" data-room="201"><div class="dot"></div><div><div class="pt-name">John Doe</div><div class="pt-room">Room 201</div></div></div>
+        <div class="patient-item" data-room="202"><div class="dot"></div><div><div class="pt-name">Mary Chen</div><div class="pt-room">Room 202</div></div></div>
+        <div class="patient-item" data-room="203"><div class="dot"></div><div><div class="pt-name">Robert Walsh</div><div class="pt-room">Room 203</div></div></div>
+        <div class="patient-item" data-room="204"><div class="dot"></div><div><div class="pt-name">Priya Nair</div><div class="pt-room">Room 204</div></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="patient-header">PATIENT: JOHN DOE — Room 201</div>
+          <div class="patient-meta">
+            <div class="meta-chip"><i class="ti ti-user"></i>Male</div>
+            <div class="meta-chip"><i class="ti ti-cake"></i>Age: 47</div>
+            <div class="meta-chip"><i class="ti ti-bed"></i>General Ward</div>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="ws-status" id="wsStatus"><span class="pulse-dot"></span>WS CONNECTING…</div>
+        <div class="time-display" id="clockDisplay">--:--:--</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Patient Config Row -->
+      <section class="patient-config" aria-label="Patient configuration">
+        <div class="config-field">
+          <label for="ivLiquid">Current IV Liquid</label>
+          <select id="ivLiquid">
+            <option>Saline Solution 500ml</option>
+            <option>Dextrose 5% 500ml</option>
+            <option>Lactated Ringer's 500ml</option>
+            <option>Normal Saline 250ml</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <label>Drug Allergies</label>
+          <div class="config-val danger">⚠ Penicillin</div>
+        </div>
+        <div class="config-field">
+          <label>Bottle Capacity</label>
+          <div class="config-val" id="bottleCapacity">500 ml</div>
+        </div>
+        <div class="config-field">
+          <label>Start Time</label>
+          <div class="config-val" id="startTime">12:45</div>
+        </div>
+      </section>
+
+      <!-- Sensor Grid -->
+      <section class="sensor-grid" aria-label="Live sensor modules">
+
+        <!-- Bottle Volume -->
+        <div class="sensor-card" id="volumeCard">
+          <div class="card-label"><i class="ti ti-droplet"></i>Saline Volume</div>
+          <div class="bottle-wrap">
+            <svg viewBox="0 0 80 150" width="80" height="150" id="bottleSVG" role="img" aria-label="IV bottle volume indicator">
+              <defs>
+                <clipPath id="liquidClip">
+                  <rect x="16" y="28" width="48" height="104" rx="6"/>
+                </clipPath>
+              </defs>
+              <!-- Neck -->
+              <rect x="30" y="10" width="20" height="14" rx="3" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
+              <rect x="33" y="7" width="14" height="6" rx="2" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
+              <!-- Body outline -->
+              <rect x="16" y="24" width="48" height="108" rx="8" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
+              <!-- Body fill bg -->
+              <rect x="18" y="26" width="44" height="104" rx="6" fill="#F0F4F6" id="bottleBg"/>
+              <!-- Liquid fill -->
+              <rect x="18" id="liquidFill" y="26" width="44" height="104" rx="0" fill="#85C1E9" opacity="0.75" clip-path="url(#liquidClip)"/>
+              <!-- Glass glare -->
+              <rect x="20" y="30" width="8" height="40" rx="4" fill="white" opacity="0.35"/>
+              <!-- Critical threshold line -->
+              <line x1="12" y1="118" x2="68" y2="118" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <text x="70" y="121" font-size="7" fill="#E74C3C" font-family="monospace">10%</text>
+              <!-- Tick marks -->
+              <line x1="18" y1="46" x2="26" y2="46" stroke="#B0BEC5" stroke-width="0.8"/>
+              <text x="28" y="49" font-size="7" fill="#B0BEC5" font-family="monospace">75%</text>
+              <line x1="18" y1="78" x2="26" y2="78" stroke="#B0BEC5" stroke-width="0.8"/>
+              <text x="28" y="81" font-size="7" fill="#B0BEC5" font-family="monospace">50%</text>
+              <line x1="18" y1="110" x2="26" y2="110" stroke="#B0BEC5" stroke-width="0.8"/>
+              <text x="28" y="113" font-size="7" fill="#B0BEC5" font-family="monospace">25%</text>
+            </svg>
+            <div class="vol-pct" id="volPct">72%</div>
+            <div class="vol-ml" id="volMl">360 ml remaining</div>
+          </div>
+          <div class="predictive"><i class="ti ti-clock"></i><span id="predictiveTime">Predictive Time to Empty: 2:15 HRS</span></div>
+        </div>
+
+        <!-- Drip Meter -->
+        <div class="sensor-card">
+          <div class="card-label"><i class="ti ti-wave-sine"></i>Drip Meter</div>
+          <div class="drip-value" id="dripValue">64</div>
+          <div class="drip-unit">DPM — Drops Per Minute</div>
+          <div class="sparkline-wrap">
+            <canvas id="sparkCanvas" role="img" aria-label="Drip rate sparkline last 60 seconds">Real-time DPM sparkline.</canvas>
+          </div>
+          <div class="flow-detail" style="margin-top:8px">Last drop interval: <strong id="lastDrop">0.94s</strong></div>
+        </div>
+
+        <!-- Flow Status -->
+        <div class="sensor-card">
+          <div class="card-label"><i class="ti ti-trending-up"></i>Flow Status</div>
+          <div class="badge nominal" id="flowBadge"><i class="ti ti-circle-check"></i><span id="flowStatus">Nominal</span></div>
+          <div class="flow-detail" style="margin-top:14px">
+            Avg (10s window)<br>
+            <span class="stat-big" id="avgDpm">63.8 DPM</span>
+          </div>
+          <div class="flow-detail" style="margin-top:10px">
+            Peak (last 60s)<br>
+            <span class="stat-big" id="peakDpm">66 DPM</span>
+          </div>
+          <div class="flow-detail" style="margin-top:10px">
+            Std Deviation<br>
+            <span class="stat-big" id="deviation">±1.2 DPM</span>
+          </div>
+        </div>
+
+        <!-- Safety Controls -->
+        <div class="sensor-card">
+          <div class="card-label"><i class="ti ti-shield-check"></i>Safety Controls</div>
+          <div class="safety-item">
+            <div>
+              <div class="safety-name">IR Drip Counter</div>
+              <div class="safety-sub">ESP32-S3 GPIO 14</div>
+            </div>
+            <div class="safety-status s-active">Active</div>
+          </div>
+          <div class="safety-item">
+            <div>
+              <div class="safety-name">Servo Valve</div>
+              <div class="safety-sub">PWM Channel 0</div>
+            </div>
+            <div class="safety-status s-ready" id="valveStatus">Ready</div>
+          </div>
+          <div class="safety-item">
+            <div>
+              <div class="safety-name">WebSocket Link</div>
+              <div class="safety-sub" id="wsHost">ws://ivguard.local:8080/ws</div>
+            </div>
+            <div class="safety-status s-active" id="wsStatusChip">Connected</div>
+          </div>
+          <button class="emergency-btn" id="emergencyBtn" aria-label="Emergency clamp — sends LOCK signal to hardware">
+            <i class="ti ti-lock"></i>
+            EMERGENCY CLAMP
+          </button>
+          <div class="emergency-hint" id="emergencyHint">Sends POST /api/clamp + MQTT LOCK signal</div>
+        </div>
+      </section>
+
+      <!-- Analytics Row -->
+      <section class="analytics-row" aria-label="Analytics and alerts">
+        <div class="analytics-card">
+          <div class="card-label"><i class="ti ti-chart-line"></i>Historical Flow Rate — Past 24 Hours</div>
+          <div class="chart-legend" id="histLegend">
+            <span><span class="leg-line" style="background:#3498DB"></span>Room 201</span>
+            <span><span class="leg-line dashed" style="border-top-color:#27AE60"></span>Room 202</span>
+            <span><span class="leg-line dotted" style="border-top-color:#F39C12"></span>Room 203</span>
+            <span><span class="leg-line" style="background:#9B59B6"></span>Room 204</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="histChart" role="img" aria-label="Multi-line historical drip rate chart for rooms 201-204 over 24 hours">Historical DPM data.</canvas>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-label"><i class="ti ti-alert-triangle"></i>Active Alerts</div>
+          <ul class="alerts-list" id="alertsList" aria-live="polite" aria-label="Alert log">
+            <li class="alert-item warn">
+              <span class="alert-time">15:45</span>
+              <span class="alert-room warn">[Rm 201]</span>
+              <span class="alert-msg">WARNING: Low Volume Threshold Approaching (15%)</span>
+            </li>
+            <li class="alert-item err">
+              <span class="alert-time">14:32</span>
+              <span class="alert-room err">[Rm 110]</span>
+              <span class="alert-msg">SYSTEM OFFLINE: Reconnecting...</span>
+            </li>
+            <li class="alert-item info">
+              <span class="alert-time">13:18</span>
+              <span class="alert-room info">[Rm 203]</span>
+              <span class="alert-msg">Flow rate stabilized after adjustment</span>
+            </li>
+            <li class="alert-item warn">
+              <span class="alert-time">12:55</span>
+              <span class="alert-room warn">[Rm 202]</span>
+              <span class="alert-msg">WARNING: Irregular drop interval detected</span>
+            </li>
+            <li class="alert-item info">
+              <span class="alert-time">12:45</span>
+              <span class="alert-room info">[Rm 201]</span>
+              <span class="alert-msg">SYSTEM: Infusion session started — 500ml Saline</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- Toast notification -->
+<div class="notify-toast" id="critToast" role="alert" aria-live="assertive">
+  <i class="ti ti-alert-triangle"></i>
+  <span id="toastMsg">Critical: Volume below threshold!</span>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
