@@ -1,6 +1,6 @@
 # IVGuard — Clinical IV Monitoring System
 
-Full-stack IV drip monitoring: ESP32-S3 firmware → Spring Boot backend → HTML/JS dashboard.
+Full-stack IV drip monitoring: ESP32-S3 firmware → Python , flask → HTML/JS dashboard.
 
 ```
 esp32/ → Arduino firmware
