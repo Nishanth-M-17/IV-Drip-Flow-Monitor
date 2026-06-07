@@ -1,0 +1,11 @@
+# IV Drip Monitoring System — Python Dependencies
+# Install: pip install -r requirements.txt
+
+flask==3.0.3
+flask-sqlalchemy==3.1.1
+flask-socketio==5.3.6
+flask-cors==4.0.1
+eventlet==0.36.1          # async transport for SocketIO (production)
+python-dotenv==1.0.1      # .env support for secrets
+requests==2.31.0          # used in test_sensor.py
+gunicorn==22.0.0          # WSGI server for deployment
