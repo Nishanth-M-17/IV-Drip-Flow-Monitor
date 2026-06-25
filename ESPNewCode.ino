@@ -7,11 +7,11 @@
 #include <LiquidCrystal_I2C.h>
 
 // #wifi
-const char* WIFI_SSID     = "Your_WiFi_Name";
-const char* WIFI_PASSWORD = "Your_WiFi_Password";
+const char* WIFI_SSID     = "Nishanth";
+const char* WIFI_PASSWORD = "nishanthm1713";
 
 // #server
-const char* SERVER_IP     = "192.168.x.x";
+const char* SERVER_IP     = " 10.86.191.185";
 const int   SERVER_PORT   = 5000;
 
 const int   PATIENT_ID    = 1;
