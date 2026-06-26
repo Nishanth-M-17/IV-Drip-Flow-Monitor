@@ -20,8 +20,8 @@ const char* DEVICE_ID     = "ESP32-001";
 float MAX_WEIGHT_G = 500.0;
 
 // #loadcell
-#define HX711_DATA_PIN   4
-#define HX711_CLOCK_PIN  5
+#define HX711_DATA_PIN   19
+#define HX711_CLOCK_PIN  18
 // #servo
 #define SERVO_PIN        18
 
