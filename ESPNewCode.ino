@@ -11,7 +11,7 @@ const char* WIFI_SSID     = "Nishanth";
 const char* WIFI_PASSWORD = "nishanthm1713";
 
 // #server
-const char* SERVER_IP     = " 10.86.191.185";
+const char* SERVER_IP     = "10.86.191.185";
 const int   SERVER_PORT   = 5000;
 
 const int   PATIENT_ID    = 1;
