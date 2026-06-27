@@ -253,12 +253,15 @@ function handleCardAction(e) {
   flowBtn.classList.toggle('active', isFlow);
   stopBtn.classList.toggle('active', !isFlow);
 
-  // ── Flask backend call (uncomment when connected) ──
-  // fetch(`/api/servo-command`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ patient_id: patientId, state: isFlow ? 'FLOW' : 'STOP' })
-  // });
+  // ── Flask backend call ──
+  fetch(`/api/servo-command`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient_id: patientId, state: isFlow ? 'FLOW' : 'STOP' })
+  })
+    .then(res => res.json())
+    .then(data => console.log('[IV Monitor] Servo command ack:', data))
+    .catch(err => console.error('[IV Monitor] Servo command failed:', err));
 
   console.log(`[IV Monitor] Patient ${patient.name} (${patient.deviceId}) → ${action.toUpperCase()}`);
 }
@@ -479,7 +482,6 @@ function initGraphsCharts() {
  * { patient_id: 1, weight_g: 320, volume_pct: 64, flow_rate: 42, time_left: "2h 30m" }
  */
 
-/*
 const socket = io('http://localhost:5000');
 
 socket.on('connect', () => {
@@ -494,7 +496,6 @@ socket.on('sensor_update', (data) => {
 socket.on('disconnect', () => {
   console.warn('[Socket.IO] Disconnected from backend');
 });
-*/
 
 /**
  * Call this when real socket data arrives.
