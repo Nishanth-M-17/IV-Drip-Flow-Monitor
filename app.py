@@ -7,20 +7,18 @@
 
 Run:
     python app.py
-
-Or with eventlet (production):
-    python -m eventlet app:app
 """
 
+import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from database import db, Patient, SensorLog
-import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 # ── APP INIT ──────────────────────────────────────────────
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
 
 # Configuration — update DB path as needed
 app.config['SECRET_KEY']                    = 'iv-monitor-secret-2024'
@@ -30,8 +28,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # CORS: allow frontend dev server if separate
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# Socket.IO — async_mode=eventlet for production
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+# Socket.IO — threading mode (works reliably on Windows)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Init DB
 db.init_app(app)
@@ -54,9 +52,9 @@ with app.app_context():
 
 # ── SERVE FRONTEND ────────────────────────────────────────
 @app.route('/')
-def serve_frontend():
+def index():
     """Serve the main HTML file (static frontend)."""
-    return send_from_directory('../frontend', 'index.html')
+    return send_from_directory(BASE_DIR, 'index.html')
 
 
 # ══════════════════════════════════════════════════════════
@@ -172,7 +170,7 @@ def receive_sensor_data():
     # Update patient record
     patient.volume_pct  = volume_pct
     patient.flow_rate   = flow_rate
-    patient.last_seen   = datetime.utcnow()
+    patient.last_seen   = datetime.now(timezone.utc)
 
     # Log to DB
     log = SensorLog(
@@ -193,7 +191,7 @@ def receive_sensor_data():
         'time_left':  time_left_str,
         'weight_g':   weight_g,
         'device_id':  device_id,
-        'timestamp':  datetime.utcnow().isoformat()
+        'timestamp':  datetime.now(timezone.utc).isoformat()
     }
     socketio.emit('sensor_update', payload)
 
